@@ -870,8 +870,6 @@ scroll x y dx dy"""
         
         position_picker = PositionPicker(self.root)
         position_picker.pick_position(callback=on_pick)
-        
-        self.log(f"Mouse position: ({pos[0]}, {pos[1]})")
     
     def capture_screen(self):
         """Chụp toàn màn hình"""
