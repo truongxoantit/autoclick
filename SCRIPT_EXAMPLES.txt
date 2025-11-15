@@ -56,9 +56,17 @@ doubleclick x y [delay]    # Double click
 move x y [delay]           # Di chuyển chuột
 wait seconds               # Chờ số giây
 key "keyname" [delay]      # Nhấn phím (ví dụ: "enter", "Ctrl+A")
+keypress "keyname" [delay] # Nhấn phím (không thả) - tiêm trực tiếp
+keyrelease "keyname" [delay] # Thả phím - tiêm trực tiếp
+keyhold "keyname" duration # Giữ phím trong duration giây - tiêm trực tiếp
 type "text" [delay]        # Gõ text
 findimage "path"           # Tìm và click hình ảnh
 scroll x y dx dy           # Cuộn chuột
+
+# Ví dụ giữ phím:
+keyhold "shift" 2.0        # Giữ Shift trong 2 giây
+keypress "ctrl"            # Nhấn Ctrl (giữ)
+keyrelease "ctrl"          # Thả Ctrl
 
 6. Phím tắt:
 ------------

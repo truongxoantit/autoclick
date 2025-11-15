@@ -354,7 +354,7 @@ class ScriptExecutor:
         return i
     
     def _execute_action(self, action: Dict[str, Any], callback=None):
-        """Thực thi một hành động"""
+        """Thực thi một hành động - tiêm trực tiếp vào chuột và bàn phím"""
         action_type = action.get('type')
         
         if callback:
@@ -491,7 +491,69 @@ class ScriptExecutor:
                     self.keyboard.press(key_obj)
                     self.keyboard.release(key_obj)
         except Exception as e:
-            print(f"Error pressing key {key_str}: {e}")
+            if callback:
+                callback(f"Error pressing key {key_str}: {e}")
+    
+    def _parse_key_name(self, key_str: str):
+        """Parse tên phím thành Key object"""
+        key_str = key_str.lower().strip()
+        
+        # Special keys
+        special_keys = {
+            'ctrl': Key.ctrl, 'ctrl_l': Key.ctrl_l, 'ctrl_r': Key.ctrl_r,
+            'alt': Key.alt, 'alt_l': Key.alt_l, 'alt_r': Key.alt_r,
+            'shift': Key.shift, 'shift_l': Key.shift_l, 'shift_r': Key.shift_r,
+            'enter': Key.enter, 'space': Key.space, 'tab': Key.tab,
+            'esc': Key.esc, 'escape': Key.esc,
+            'backspace': Key.backspace, 'delete': Key.delete,
+            'up': Key.up, 'down': Key.down, 'left': Key.left, 'right': Key.right,
+            'home': Key.home, 'end': Key.end,
+            'page_up': Key.page_up, 'page_down': Key.page_down,
+            'f1': Key.f1, 'f2': Key.f2, 'f3': Key.f3, 'f4': Key.f4,
+            'f5': Key.f5, 'f6': Key.f6, 'f7': Key.f7, 'f8': Key.f8,
+            'f9': Key.f9, 'f10': Key.f10, 'f11': Key.f11, 'f12': Key.f12,
+        }
+        
+        if key_str in special_keys:
+            return special_keys[key_str]
+        
+        # Regular character
+        if len(key_str) == 1:
+            return key_str
+        
+        return None
+    
+    def _press_key_only(self, key_str: str):
+        """Chỉ nhấn phím (không thả) - tiêm trực tiếp vào bàn phím"""
+        try:
+            key = self._parse_key_name(key_str)
+            if key:
+                self.keyboard.press(key)
+        except Exception as e:
+            if callback:
+                callback(f"Error pressing key {key_str}: {e}")
+    
+    def _release_key_only(self, key_str: str):
+        """Chỉ thả phím - tiêm trực tiếp vào bàn phím"""
+        try:
+            key = self._parse_key_name(key_str)
+            if key:
+                self.keyboard.release(key)
+        except Exception as e:
+            if callback:
+                callback(f"Error releasing key {key_str}: {e}")
+    
+    def _hold_key(self, key_str: str, duration: float):
+        """Giữ phím trong một khoảng thời gian - tiêm trực tiếp vào bàn phím"""
+        try:
+            key = self._parse_key_name(key_str)
+            if key:
+                self.keyboard.press(key)
+                time.sleep(duration)
+                self.keyboard.release(key)
+        except Exception as e:
+            if callback:
+                callback(f"Error holding key {key_str}: {e}")
     
     def _type_text(self, text: str, delay: float = 0.05):
         """Gõ text"""
