@@ -21,6 +21,7 @@ hiddenimports = [
     # Custom modules
     'action_recorder', 'action_player', 'image_finder', 'script_executor',
     'image_picker', 'region_selector', 'key_manager', 'key_activation_dialog',
+    'auto_registration',
     # Standard library modules (đảm bảo)
     'threading', 'json', 'hashlib', 'platform', 'datetime', 'time', 'sys', 'os', 'typing', 're',
 ]

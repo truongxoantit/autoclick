@@ -13,15 +13,13 @@ class KeyActivationDialog:
         self.key_manager = key_manager
         self.result = False
         
-        # Tạo dialog
+        # Tạo dialog nhỏ gọn
         self.dialog = tk.Toplevel(parent)
-        self.dialog.title("Kích hoạt License Key - Auto Click")
-        self.dialog.geometry("550x450")
+        self.dialog.title("License Key")
+        self.dialog.geometry("400x150")
         self.dialog.resizable(False, False)
         self.dialog.transient(parent)
         self.dialog.grab_set()
-        
-        # Đảm bảo dialog luôn ở trên cùng
         self.dialog.attributes('-topmost', True)
         
         # Center dialog
@@ -39,114 +37,48 @@ class KeyActivationDialog:
         self.dialog.bind('<Return>', lambda e: self.activate_key())
     
     def create_widgets(self):
-        """Tạo các widget"""
-        # Header
-        header_frame = ttk.Frame(self.dialog, padding="20")
-        header_frame.pack(fill=tk.X)
+        """Tạo các widget - nhỏ gọn, chỉ có ô nhập key"""
+        # Main frame
+        main_frame = ttk.Frame(self.dialog, padding="20")
+        main_frame.pack(fill=tk.BOTH, expand=True)
         
+        # Label
         ttk.Label(
-            header_frame,
-            text="🔑 Kích hoạt License Key",
-            font=("Arial", 18, "bold")
-        ).pack()
-        
-        ttk.Label(
-            header_frame,
-            text="Nhập key để sử dụng ứng dụng Auto Click",
-            font=("Arial", 10),
-            foreground="gray"
-        ).pack(pady=(5, 0))
-        
-        # Thông tin thêm
-        info_text = ttk.Label(
-            header_frame,
-            text="Key sẽ được kiểm tra với GitHub để xác thực",
-            font=("Arial", 8),
-            foreground="blue"
-        )
-        info_text.pack(pady=(5, 0))
-        
-        # Machine ID
-        info_frame = ttk.LabelFrame(self.dialog, text="Thông tin máy", padding="10")
-        info_frame.pack(fill=tk.X, padx=20, pady=10)
-        
-        machine_id = self.key_manager.get_machine_id()
-        ttk.Label(info_frame, text=f"Machine ID: {machine_id}", font=("Consolas", 9)).pack(anchor=tk.W)
-        
-        # Kiểm tra trạng thái đăng ký
-        if hasattr(self.key_manager, 'auto_registration'):
-            reg_status = self.key_manager.auto_registration.get_registration_status()
-            if reg_status:
-                status_text = f"Trạng thái: {reg_status.get('status', 'pending')}"
-                if reg_status.get('status') == 'approved':
-                    status_color = "green"
-                elif reg_status.get('status') == 'rejected':
-                    status_color = "red"
-                else:
-                    status_color = "orange"
-                ttk.Label(
-                    info_frame,
-                    text=status_text,
-                    font=("Arial", 8),
-                    foreground=status_color
-                ).pack(anchor=tk.W, pady=(2, 0))
-        
-        ttk.Label(
-            info_frame,
-            text="Máy đã được tự động đăng ký lên GitHub. Vui lòng chờ admin phê duyệt.",
-            font=("Arial", 8),
-            foreground="blue"
-        ).pack(anchor=tk.W, pady=(5, 0))
+            main_frame,
+            text="Nhập License Key:",
+            font=("Arial", 10)
+        ).pack(anchor=tk.W, pady=(0, 5))
         
         # Key input
-        key_frame = ttk.LabelFrame(self.dialog, text="License Key", padding="10")
-        key_frame.pack(fill=tk.X, padx=20, pady=10)
-        
-        ttk.Label(key_frame, text="Nhập License Key:", font=("Arial", 10, "bold")).pack(anchor=tk.W)
-        self.key_entry = ttk.Entry(key_frame, width=50, font=("Consolas", 12))
-        self.key_entry.pack(fill=tk.X, pady=(5, 10))
-        
-        # Hướng dẫn
-        help_label = ttk.Label(
-            key_frame,
-            text="💡 Nhập key bạn đã nhận được và nhấn Enter hoặc nút 'Kích hoạt'",
-            font=("Arial", 8),
-            foreground="gray"
-        )
-        help_label.pack(anchor=tk.W)
+        self.key_entry = ttk.Entry(main_frame, width=40, font=("Consolas", 11))
+        self.key_entry.pack(fill=tk.X, pady=(0, 10))
         
         # Buttons
-        btn_frame = ttk.Frame(self.dialog, padding="20")
+        btn_frame = ttk.Frame(main_frame)
         btn_frame.pack(fill=tk.X)
         
-        # Button frame với center alignment
-        btn_center = ttk.Frame(btn_frame)
-        btn_center.pack()
-        
-        activate_btn = ttk.Button(
-            btn_center,
-            text="✅ Kích hoạt",
+        ttk.Button(
+            btn_frame,
+            text="Kích hoạt",
             command=self.activate_key,
-            width=20
-        )
-        activate_btn.pack(side=tk.LEFT, padx=5)
+            width=15
+        ).pack(side=tk.LEFT, padx=(0, 5))
         
-        cancel_btn = ttk.Button(
-            btn_center,
-            text="❌ Hủy",
+        ttk.Button(
+            btn_frame,
+            text="Hủy",
             command=self.cancel,
-            width=20
-        )
-        cancel_btn.pack(side=tk.LEFT, padx=5)
+            width=15
+        ).pack(side=tk.LEFT)
         
-        # Status
+        # Status (ẩn cho đến khi có lỗi)
         self.status_label = ttk.Label(
-            self.dialog,
+            main_frame,
             text="",
-            font=("Arial", 9),
+            font=("Arial", 8),
             foreground="red"
         )
-        self.status_label.pack(pady=10)
+        self.status_label.pack(pady=(5, 0))
     
     def activate_key(self):
         """Kích hoạt key"""

@@ -162,7 +162,7 @@ class AutoClickApp:
         self.license_label.pack(side=tk.RIGHT, padx=5)
         self.update_license_status()
         
-        # Kiểm tra license định kỳ (mỗi 5 phút)
+        # Kiểm tra license định kỳ (mỗi 10 phút)
         self.check_license_periodically()
         
     def create_widgets(self):
@@ -1177,7 +1177,7 @@ scroll x y dx dy"""
             self.license_label.config(text="No License", foreground="red")
     
     def check_license_periodically(self):
-        """Kiểm tra license định kỳ"""
+        """Kiểm tra license định kỳ - mỗi 10 phút"""
         if not self.key_manager.check_key():
             messagebox.showerror(
                 "License Expired",
@@ -1186,8 +1186,8 @@ scroll x y dx dy"""
             self.root.after(5000, lambda: sys.exit(0))
         else:
             self.update_license_status()
-            # Kiểm tra lại sau 5 phút
-            self.root.after(300000, self.check_license_periodically)  # 5 phút = 300000ms
+            # Kiểm tra lại sau 10 phút (600000ms)
+            self.root.after(600000, self.check_license_periodically)
 
 
 def main():
