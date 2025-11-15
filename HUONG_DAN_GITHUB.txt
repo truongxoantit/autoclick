@@ -1,0 +1,51 @@
+═══════════════════════════════════════════════════════════════
+HƯỚNG DẪN ĐƯA CODE LÊN GITHUB
+═══════════════════════════════════════════════════════════════
+
+✅ Git repository đã được khởi tạo và commit thành công!
+
+BƯỚC 1: TẠO REPOSITORY TRÊN GITHUB
+───────────────────────────────────────────────────────────────
+1. Mở trình duyệt và truy cập: https://github.com/new
+2. Repository name: autoclick
+3. Description: Auto Click - Automatic Mouse and Keyboard
+4. Chọn Public hoặc Private (tùy bạn)
+5. ⚠️ QUAN TRỌNG: KHÔNG tích "Initialize with README"
+6. Click nút "Create repository"
+
+BƯỚC 2: PUSH CODE LÊN GITHUB
+───────────────────────────────────────────────────────────────
+
+CÁCH 1: Sử dụng script tự động (Khuyến nghị)
+──────────────────────────────────────────────
+Chạy file: PUSH_GITHUB.bat
+Script sẽ hướng dẫn bạn từng bước và tự động push code lên.
+
+CÁCH 2: Làm thủ công
+──────────────────────────────────────────────
+1. Mở Command Prompt hoặc PowerShell tại thư mục autoclick
+2. Chạy các lệnh sau (thay YOUR_USERNAME bằng username GitHub của bạn):
+
+   git remote add origin https://github.com/YOUR_USERNAME/autoclick.git
+   git push -u origin main
+
+3. Khi được hỏi username/password:
+   - Username: Tên GitHub của bạn
+   - Password: Sử dụng Personal Access Token (không phải password thường)
+
+TẠO PERSONAL ACCESS TOKEN (Nếu cần)
+───────────────────────────────────────────────────────────────
+1. Truy cập: https://github.com/settings/tokens
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Đặt tên token (ví dụ: "autoclick-push")
+4. Chọn quyền: ✅ repo (Full control of private repositories)
+5. Click "Generate token"
+6. Copy token và dùng làm password khi push
+
+SAU KHI PUSH THÀNH CÔNG
+───────────────────────────────────────────────────────────────
+Repository của bạn sẽ có tại:
+https://github.com/YOUR_USERNAME/autoclick
+
+═══════════════════════════════════════════════════════════════
+

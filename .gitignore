@@ -48,6 +48,7 @@ images/*.bmp
 !SCRIPT_EXAMPLES.txt
 !GITHUB_SETUP.md
 !QUICK_START.md
+!HUONG_DAN_GITHUB.txt
 
 # Logs
 *.log
