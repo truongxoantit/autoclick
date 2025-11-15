@@ -39,10 +39,15 @@ class AutoClickApp:
         # Khởi tạo Key Manager
         self.key_manager = KeyManager(github_repo="truongxoantit/autoclick")
         
-        # Kiểm tra key trước khi khởi động
-        if not self.check_license():
-            root.destroy()
-            sys.exit(0)
+        # Kiểm tra key trước khi khởi động (chỉ hiện dialog nếu chưa có key)
+        if not self.key_manager.check_key():
+            # Hiển thị dialog kích hoạt key ngay khi khởi động
+            dialog = KeyActivationDialog(self.root, self.key_manager)
+            if not dialog.show():
+                # Người dùng không kích hoạt key hoặc hủy
+                messagebox.showerror("License Required", "Bạn cần kích hoạt key để sử dụng ứng dụng!")
+                root.destroy()
+                sys.exit(0)
         
         # Biến trạng thái
         self.recording_file = None
