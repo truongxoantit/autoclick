@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+images/*.png
+images/*.jpg
+images/*.jpeg
+images/*.bmp
+*.json
+*.txt
+!requirements.txt
+!README.md
+!SCRIPT_EXAMPLES.txt
+!GITHUB_SETUP.md
+!QUICK_START.md
+
+# Logs
+*.log
+
+# Keep images folder but ignore contents
+images/.gitkeep
+

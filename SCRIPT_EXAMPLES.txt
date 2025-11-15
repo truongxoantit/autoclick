@@ -1,0 +1,95 @@
+VÍ DỤ SỬ DỤNG SCRIPT VỚI IF-ELSE
+==================================
+
+1. Tìm hình ảnh và click nếu tìm thấy:
+---------------------------------------
+if image "button.png" found
+    click 100 200 0.5
+    wait 1.0
+else
+    click 300 400 0.5
+endif
+
+2. Kiểm tra cửa sổ và thực hiện hành động:
+------------------------------------------
+if window "Notepad" exists
+    click 50 50 0.3
+    type "Hello World" 0.05
+    key enter 0.2
+else
+    click 100 100 0.3
+    key escape 0.2
+endif
+
+3. Tìm hình ảnh trong vùng cụ thể:
+-----------------------------------
+if image "icon.png" found in region [0, 0 800x600]
+    click 400 300 0.5
+endif
+
+4. Script phức tạp với nhiều điều kiện:
+----------------------------------------
+# Tìm nút OK
+if image "ok_button.png" found
+    click 500 400 0.5
+    wait 1.0
+    
+    # Kiểm tra cửa sổ xác nhận
+    if window "Confirm" exists
+        click 300 200 0.3
+        key enter 0.2
+    else
+        key escape 0.2
+    endif
+else
+    # Không tìm thấy, thử tìm nút Cancel
+    if image "cancel_button.png" found
+        click 600 400 0.5
+    endif
+endif
+
+5. Các lệnh cơ bản:
+-------------------
+click x y [delay]          # Click tại (x,y) với delay (giây)
+rightclick x y [delay]     # Click phải
+doubleclick x y [delay]    # Double click
+move x y [delay]           # Di chuyển chuột
+wait seconds               # Chờ số giây
+key "keyname" [delay]      # Nhấn phím (ví dụ: "enter", "Ctrl+A")
+type "text" [delay]        # Gõ text
+findimage "path"           # Tìm và click hình ảnh
+scroll x y dx dy           # Cuộn chuột
+
+6. Phím tắt:
+------------
+F4 - Bật/tắt ghi lại
+F5 - Smart Click (tìm và click hình ảnh)
+F6 - Phát lại
+F7 - Dừng
+
+7. Ví dụ script hoàn chỉnh:
+----------------------------
+# Script tự động login
+wait 2.0
+if image "login_button.png" found
+    click 500 300 0.5
+    wait 1.0
+    type "username" 0.05
+    key tab 0.2
+    type "password" 0.05
+    key enter 0.5
+    
+    # Chờ và kiểm tra kết quả
+    wait 3.0
+    if image "success.png" found
+        click 400 200 0.5
+    else
+        if image "error.png" found
+            click 600 200 0.5
+            key escape 0.2
+        endif
+    endif
+else
+    click 100 100 0.3
+endif
+
