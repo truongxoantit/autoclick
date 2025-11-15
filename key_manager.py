@@ -4,6 +4,7 @@ Module quản lý key license với GitHub
 - Quản lý thời gian hết hạn
 - Mỗi máy chỉ dùng 1 key
 - Tự động đóng ứng dụng nếu key hết hạn
+- Tự động đăng ký máy lên GitHub
 """
 import os
 import json
@@ -14,14 +15,16 @@ import time
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import tkinter.messagebox as messagebox
+from auto_registration import AutoRegistration
 
 
 class KeyManager:
-    def __init__(self, github_repo: str = "truongxoantit/autoclick", key_file: str = "license.key"):
+    def __init__(self, github_repo: str = "truongxoantit/autoclick", key_file: str = "license.key", auto_register: bool = True):
         """
         Khởi tạo KeyManager
         :param github_repo: Repository GitHub chứa keys (format: username/repo)
         :param key_file: File lưu key local
+        :param auto_register: Tự động đăng ký máy lên GitHub khi khởi động
         """
         self.github_repo = github_repo
         self.key_file = key_file
@@ -29,6 +32,11 @@ class KeyManager:
         self.machine_id = self._get_machine_id()
         self.current_key = None
         self.key_data = None
+        
+        # Tự động đăng ký máy lên GitHub
+        if auto_register:
+            self.auto_registration = AutoRegistration(github_repo=github_repo)
+            self._auto_register_machine()
         
     def _get_machine_id(self) -> str:
         """Lấy ID duy nhất của máy"""

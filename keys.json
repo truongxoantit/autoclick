@@ -17,7 +17,7 @@
     {
       "key": "TEST-KEY-2024-001",
       "key_name": "Test Key",
-      "expire_date": "2025-01-31T23:59:59",
+      "expire_date": "2028-01-31T23:59:59",
       "machine_id": null,
       "created_date": "2024-01-01T00:00:00"
     }

@@ -72,11 +72,30 @@ class KeyActivationDialog:
         
         machine_id = self.key_manager.get_machine_id()
         ttk.Label(info_frame, text=f"Machine ID: {machine_id}", font=("Consolas", 9)).pack(anchor=tk.W)
+        
+        # Kiểm tra trạng thái đăng ký
+        if hasattr(self.key_manager, 'auto_registration'):
+            reg_status = self.key_manager.auto_registration.get_registration_status()
+            if reg_status:
+                status_text = f"Trạng thái: {reg_status.get('status', 'pending')}"
+                if reg_status.get('status') == 'approved':
+                    status_color = "green"
+                elif reg_status.get('status') == 'rejected':
+                    status_color = "red"
+                else:
+                    status_color = "orange"
+                ttk.Label(
+                    info_frame,
+                    text=status_text,
+                    font=("Arial", 8),
+                    foreground=status_color
+                ).pack(anchor=tk.W, pady=(2, 0))
+        
         ttk.Label(
             info_frame,
-            text="Mỗi máy chỉ có thể sử dụng 1 key",
+            text="Máy đã được tự động đăng ký lên GitHub. Vui lòng chờ admin phê duyệt.",
             font=("Arial", 8),
-            foreground="gray"
+            foreground="blue"
         ).pack(anchor=tk.W, pady=(5, 0))
         
         # Key input
