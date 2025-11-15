@@ -7,7 +7,7 @@
 ### 🎯 Cơ bản
 - **Ghi lại thao tác**: Ghi lại tất cả click, di chuyển chuột, cuộn (F4)
 - **Phát lại thao tác**: Phát lại với tốc độ tùy chỉnh, lặp lại (F6)
-- **Tìm và click hình ảnh**: Tự động tìm và click vào hình ảnh trên màn hình (F5)
+- **Tìm và click hình ảnh**: Tự động tìm và **tự động click** vào hình ảnh trên màn hình (F5)
 - **Pick Image**: Chụp vùng màn hình và lưu tự động (F9)
 - **Get Position**: Lấy vị trí chuột hiện tại (F10)
 
@@ -58,7 +58,7 @@ python main.py
 
 ### Phím tắt:
 - **F4**: Bật/tắt ghi lại thao tác
-- **F5**: Smart Click - Tìm và tự động click hình ảnh
+- **F5**: Smart Click - Tìm và **tự động click** hình ảnh
 - **F6**: Phát lại thao tác
 - **F7**: Dừng tất cả
 - **F8**: Chạy script
