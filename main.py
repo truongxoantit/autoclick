@@ -1119,8 +1119,70 @@ scroll x y dx dy"""
                 'seconds': action_dict.get('seconds', 1.0),
                 'time': action_dict.get('delay', 1.0)
             }
+            else:
+                return action_dict
+    
+    def check_license(self) -> bool:
+        """Kiểm tra license key"""
+        if not self.key_manager.check_key():
+            # Hiển thị dialog kích hoạt key
+            dialog = KeyActivationDialog(self.root, self.key_manager)
+            if dialog.show():
+                return True
+            else:
+                messagebox.showerror("License Required", "Bạn cần kích hoạt key để sử dụng ứng dụng!")
+                return False
+        return True
+    
+    def show_license_info(self):
+        """Hiển thị thông tin license"""
+        key_info = self.key_manager.get_key_info()
+        if key_info:
+            info_text = f"Key Name: {key_info['key_name']}\n"
+            info_text += f"Expire Date: {key_info['expire_date']}\n"
+            info_text += f"Days Remaining: {key_info['days_remaining']} days\n"
+            info_text += f"Machine ID: {self.key_manager.get_machine_id()}"
+            messagebox.showinfo("License Information", info_text)
         else:
-            return action_dict
+            messagebox.showwarning("No License", "Chưa có key được kích hoạt!")
+    
+    def activate_license(self):
+        """Kích hoạt license key mới"""
+        dialog = KeyActivationDialog(self.root, self.key_manager)
+        if dialog.show():
+            self.update_license_status()
+            messagebox.showinfo("Success", "Key đã được kích hoạt thành công!")
+    
+    def update_license_status(self):
+        """Cập nhật trạng thái license trên toolbar"""
+        key_info = self.key_manager.get_key_info()
+        if key_info:
+            days = key_info['days_remaining']
+            if days > 30:
+                color = "green"
+            elif days > 7:
+                color = "orange"
+            else:
+                color = "red"
+            self.license_label.config(
+                text=f"License: {key_info['key_name']} ({days}d)",
+                foreground=color
+            )
+        else:
+            self.license_label.config(text="No License", foreground="red")
+    
+    def check_license_periodically(self):
+        """Kiểm tra license định kỳ"""
+        if not self.key_manager.check_key():
+            messagebox.showerror(
+                "License Expired",
+                "Key của bạn đã hết hạn! Ứng dụng sẽ đóng sau 5 giây."
+            )
+            self.root.after(5000, lambda: sys.exit(0))
+        else:
+            self.update_license_status()
+            # Kiểm tra lại sau 5 phút
+            self.root.after(300000, self.check_license_periodically)  # 5 phút = 300000ms
 
 
 def main():
