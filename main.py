@@ -851,46 +851,25 @@ scroll x y dx dy"""
             self.root.deiconify()  # Hiện lại cửa sổ chính
     
     def get_mouse_position(self):
-        """Lấy vị trí chuột hiện tại (F10)"""
-        self.root.withdraw()
-        time.sleep(0.5)
-        
-        pos = self.mouse_controller.position
-        self.root.deiconify()
-        
-        # Hiển thị dialog với vị trí
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Mouse Position")
-        dialog.geometry("300x150")
-        dialog.transient(self.root)
-        dialog.grab_set()
-        
-        ttk.Label(dialog, text=f"X: {pos[0]}\nY: {pos[1]}", font=("Arial", 12)).pack(pady=20)
-        
-        def copy_pos():
-            dialog.clipboard_clear()
-            dialog.clipboard_append(f"{pos[0]}, {pos[1]}")
-            messagebox.showinfo("Copied", "Position copied to clipboard!")
-        
-        def add_click():
+        """Lấy vị trí chuột bằng cách pick với Ctrl (F10)"""
+        def on_pick(x, y):
+            # Copy vào clipboard
+            self.root.clipboard_clear()
+            self.root.clipboard_append(f"{x}, {y}")
+            
             action = {
                 'type': 'click',
-                'x': pos[0],
-                'y': pos[1],
+                'x': x,
+                'y': y,
                 'delay': 0.1,
-                'description': f'Click at ({pos[0]}, {pos[1]})'
+                'description': f'Mouse Click at ({x}, {y})'
             }
             self.actions_list.append(action)
             self.update_actions_display()
-            dialog.destroy()
-            self.log(f"Added click at ({pos[0]}, {pos[1]})")
+            self.log(f"Picked position: ({x}, {y}) - Copied to clipboard")
         
-        btn_frame = ttk.Frame(dialog)
-        btn_frame.pack(pady=10)
-        
-        ttk.Button(btn_frame, text="Copy", command=copy_pos).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="Add Click", command=add_click).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="Close", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
+        position_picker = PositionPicker(self.root)
+        position_picker.pick_position(callback=on_pick)
         
         self.log(f"Mouse position: ({pos[0]}, {pos[1]})")
     
