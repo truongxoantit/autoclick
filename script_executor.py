@@ -204,6 +204,25 @@ class ScriptExecutor:
             x, y, dx, dy = int(parts[1]), int(parts[2]), int(parts[3]), int(parts[4])
             return {'type': 'scroll', 'x': x, 'y': y, 'dx': dx, 'dy': dy, 'line': line_num}
         
+        elif cmd == 'keyhold' or cmd == 'key_hold':
+            if len(parts) < 3:
+                raise ValueError("keyhold requires key duration")
+            key_name = parts[1]
+            duration = float(parts[2])
+            return {'type': 'key_hold', 'key': key_name, 'duration': duration, 'line': line_num}
+        
+        elif cmd == 'keypress' or cmd == 'key_press':
+            if len(parts) < 2:
+                raise ValueError("keypress requires key")
+            key_name = parts[1]
+            return {'type': 'key_press', 'key': key_name, 'line': line_num}
+        
+        elif cmd == 'keyrelease' or cmd == 'key_release':
+            if len(parts) < 2:
+                raise ValueError("keyrelease requires key")
+            key_name = parts[1]
+            return {'type': 'key_release', 'key': key_name, 'line': line_num}
+        
         return None
     
     def execute_actions(self, actions: List[Dict[str, Any]], loop: bool = False, callback=None):
@@ -369,6 +388,22 @@ class ScriptExecutor:
         elif action_type == 'key':
             self._press_key(action['key'])
             time.sleep(action.get('delay', 0.1))
+        
+        elif action_type == 'key_press':
+            # Nhấn phím (tiêm trực tiếp vào bàn phím)
+            self._press_key_only(action['key'])
+            time.sleep(action.get('delay', 0.1))
+        
+        elif action_type == 'key_release':
+            # Thả phím (tiêm trực tiếp vào bàn phím)
+            self._release_key_only(action['key'])
+            time.sleep(action.get('delay', 0.1))
+        
+        elif action_type == 'key_hold':
+            # Giữ phím trong một khoảng thời gian (tiêm trực tiếp vào bàn phím)
+            key_name = action['key']
+            duration = action.get('duration', 1.0)
+            self._hold_key(key_name, duration)
             
         elif action_type == 'type':
             self._type_text(action['text'], action.get('delay', 0.05))

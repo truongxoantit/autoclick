@@ -1,9 +1,11 @@
 """
 Module phát lại các thao tác đã ghi lại
 Sử dụng pynput để mô phỏng click như người dùng thật
+Tiêm trực tiếp vào chuột và bàn phím, không dùng Windows API
 """
 import time
 from pynput.mouse import Button, Controller as MouseController
+from pynput.keyboard import Key, Controller as KeyboardController
 from typing import List, Dict, Any
 
 
@@ -15,8 +17,10 @@ class ActionPlayer:
         """
         self.speed_multiplier = speed_multiplier
         self.mouse = MouseController()
+        self.keyboard = KeyboardController()
         self.is_playing = False
         self.current_action_index = 0
+        self.held_keys = set()  # Tập hợp các phím đang được giữ
         
     def play_actions(self, actions: List[Dict[str, Any]], loop: bool = False):
         """
@@ -94,7 +98,107 @@ class ActionPlayer:
             self.mouse.position = (x, y)
             self.mouse.scroll(dx, dy)
         
+        # Xử lý phím bàn phím
+        elif action_type == 'key_press':
+            key_name = action.get('key', '')
+            self._press_key(key_name)
+            
+        elif action_type == 'key_release':
+            key_name = action.get('key', '')
+            self._release_key(key_name)
+            
+        elif action_type == 'key_hold':
+            key_name = action.get('key', '')
+            duration = action.get('duration', 1.0)
+            self._hold_key(key_name, duration)
+        
         self.current_action_index += 1
+    
+    def _press_key(self, key_name: str):
+        """Nhấn phím (tiêm trực tiếp vào bàn phím)"""
+        try:
+            key = self._parse_key(key_name)
+            if key:
+                self.keyboard.press(key)
+                self.held_keys.add(key_name)
+        except Exception as e:
+            print(f"Error pressing key {key_name}: {e}")
+    
+    def _release_key(self, key_name: str):
+        """Thả phím (tiêm trực tiếp vào bàn phím)"""
+        try:
+            key = self._parse_key(key_name)
+            if key:
+                self.keyboard.release(key)
+                self.held_keys.discard(key_name)
+        except Exception as e:
+            print(f"Error releasing key {key_name}: {e}")
+    
+    def _hold_key(self, key_name: str, duration: float):
+        """Giữ phím trong một khoảng thời gian"""
+        try:
+            key = self._parse_key(key_name)
+            if key:
+                self.keyboard.press(key)
+                self.held_keys.add(key_name)
+                time.sleep(duration)
+                self.keyboard.release(key)
+                self.held_keys.discard(key_name)
+        except Exception as e:
+            print(f"Error holding key {key_name}: {e}")
+    
+    def _parse_key(self, key_name: str):
+        """Parse tên phím thành Key object"""
+        key_name = key_name.lower().strip()
+        
+        # Special keys
+        special_keys = {
+            'ctrl': Key.ctrl,
+            'ctrl_l': Key.ctrl_l,
+            'ctrl_r': Key.ctrl_r,
+            'alt': Key.alt,
+            'alt_l': Key.alt_l,
+            'alt_r': Key.alt_r,
+            'shift': Key.shift,
+            'shift_l': Key.shift_l,
+            'shift_r': Key.shift_r,
+            'enter': Key.enter,
+            'space': Key.space,
+            'tab': Key.tab,
+            'esc': Key.esc,
+            'escape': Key.esc,
+            'backspace': Key.backspace,
+            'delete': Key.delete,
+            'up': Key.up,
+            'down': Key.down,
+            'left': Key.left,
+            'right': Key.right,
+            'home': Key.home,
+            'end': Key.end,
+            'page_up': Key.page_up,
+            'page_down': Key.page_down,
+            'f1': Key.f1, 'f2': Key.f2, 'f3': Key.f3, 'f4': Key.f4,
+            'f5': Key.f5, 'f6': Key.f6, 'f7': Key.f7, 'f8': Key.f8,
+            'f9': Key.f9, 'f10': Key.f10, 'f11': Key.f11, 'f12': Key.f12,
+        }
+        
+        if key_name in special_keys:
+            return special_keys[key_name]
+        
+        # Regular character
+        if len(key_name) == 1:
+            return key_name
+        
+        return None
+    
+    def release_all_keys(self):
+        """Thả tất cả các phím đang được giữ"""
+        for key_name in list(self.held_keys):
+            try:
+                self._release_key(key_name)
+            except:
+                pass
+        self.held_keys.clear()
     
     def _smooth_move(self, target_x: int, target_y: int, steps: int = 10):
         """
@@ -118,6 +222,7 @@ class ActionPlayer:
             time.sleep(0.001)  # Nhỏ delay giữa các bước
     
     def stop(self):
-        """Dừng phát lại"""
+        """Dừng phát lại và thả tất cả phím đang giữ"""
         self.is_playing = False
+        self.release_all_keys()
 

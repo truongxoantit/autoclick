@@ -13,6 +13,7 @@ from image_finder import ImageFinder
 from script_executor import ScriptExecutor
 from image_picker import ImagePicker
 from region_selector import RegionSelector
+from position_picker import PositionPicker
 from key_manager import KeyManager
 from key_activation_dialog import KeyActivationDialog
 from pynput import keyboard
