@@ -3,12 +3,14 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = [('SCRIPT_EXAMPLES.txt', '.')]
 binaries = []
-hiddenimports = ['pynput', 'pynput.mouse', 'pynput.keyboard', 'PIL', 'PIL.ImageGrab', 'cv2', 'numpy', 'requests']
+hiddenimports = ['pynput', 'pynput.mouse', 'pynput.keyboard', 'PIL', 'PIL.ImageGrab', 'cv2', 'numpy', 'requests', 'urllib3', 'certifi', 'charset_normalizer', 'idna']
 tmp_ret = collect_all('pynput')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('PIL')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('cv2')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('requests')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 

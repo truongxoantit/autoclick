@@ -19,9 +19,14 @@ pyinstaller --name=AutoClick --onefile --windowed --noconsole ^
     --hidden-import=cv2 ^
     --hidden-import=numpy ^
     --hidden-import=requests ^
+    --hidden-import=urllib3 ^
+    --hidden-import=certifi ^
+    --hidden-import=charset_normalizer ^
+    --hidden-import=idna ^
     --collect-all=pynput ^
     --collect-all=PIL ^
     --collect-all=cv2 ^
+    --collect-all=requests ^
     main.py
 
 if %errorlevel% equ 0 (
