@@ -1119,8 +1119,8 @@ scroll x y dx dy"""
                 'seconds': action_dict.get('seconds', 1.0),
                 'time': action_dict.get('delay', 1.0)
             }
-            else:
-                return action_dict
+        else:
+            return action_dict
     
     def check_license(self) -> bool:
         """Kiểm tra license key"""
