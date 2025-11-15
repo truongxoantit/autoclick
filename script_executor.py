@@ -390,20 +390,21 @@ class ScriptExecutor:
             time.sleep(action.get('delay', 0.1))
         
         elif action_type == 'key_press':
-            # Nhấn phím (tiêm trực tiếp vào bàn phím)
-            self._press_key_only(action['key'])
+            # Nhấn phím (tiêm trực tiếp vào bàn phím) - không thả
+            self._press_key_only(action['key'], callback)
             time.sleep(action.get('delay', 0.1))
         
         elif action_type == 'key_release':
             # Thả phím (tiêm trực tiếp vào bàn phím)
-            self._release_key_only(action['key'])
+            self._release_key_only(action['key'], callback)
             time.sleep(action.get('delay', 0.1))
         
         elif action_type == 'key_hold':
             # Giữ phím trong một khoảng thời gian (tiêm trực tiếp vào bàn phím)
             key_name = action['key']
             duration = action.get('duration', 1.0)
-            self._hold_key(key_name, duration)
+            self._hold_key(key_name, duration, callback)
+            time.sleep(0.1)
             
         elif action_type == 'type':
             self._type_text(action['text'], action.get('delay', 0.05))
@@ -523,7 +524,7 @@ class ScriptExecutor:
         
         return None
     
-    def _press_key_only(self, key_str: str):
+    def _press_key_only(self, key_str: str, callback=None):
         """Chỉ nhấn phím (không thả) - tiêm trực tiếp vào bàn phím"""
         try:
             key = self._parse_key_name(key_str)
@@ -533,7 +534,7 @@ class ScriptExecutor:
             if callback:
                 callback(f"Error pressing key {key_str}: {e}")
     
-    def _release_key_only(self, key_str: str):
+    def _release_key_only(self, key_str: str, callback=None):
         """Chỉ thả phím - tiêm trực tiếp vào bàn phím"""
         try:
             key = self._parse_key_name(key_str)
@@ -543,7 +544,7 @@ class ScriptExecutor:
             if callback:
                 callback(f"Error releasing key {key_str}: {e}")
     
-    def _hold_key(self, key_str: str, duration: float):
+    def _hold_key(self, key_str: str, duration: float, callback=None):
         """Giữ phím trong một khoảng thời gian - tiêm trực tiếp vào bàn phím"""
         try:
             key = self._parse_key_name(key_str)
