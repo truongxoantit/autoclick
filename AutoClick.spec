@@ -1,46 +1,36 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_all
 
-block_cipher = None
+datas = [('SCRIPT_EXAMPLES.txt', '.')]
+binaries = []
+hiddenimports = ['pynput', 'pynput.mouse', 'pynput.keyboard', 'PIL', 'PIL.ImageGrab', 'cv2', 'numpy', 'requests']
+tmp_ret = collect_all('pynput')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('PIL')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('cv2')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+
 
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
-    datas=[
-        ('SCRIPT_EXAMPLES.txt', '.'),
-    ],
-    hiddenimports=[
-        'pynput',
-        'pynput.mouse',
-        'pynput.keyboard',
-        'PIL',
-        'PIL.ImageGrab',
-        'cv2',
-        'numpy',
-        'requests',
-        'tkinter',
-        'tkinter.ttk',
-        'tkinter.filedialog',
-        'tkinter.messagebox',
-        'tkinter.scrolledtext',
-    ],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    win_no_prefer_redirects=False,
-    win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
+    optimize=0,
 )
-
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
-    a.zipfiles,
     a.datas,
     [],
     name='AutoClick',
@@ -50,12 +40,10 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # Không hiện console
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # Có thể thêm icon sau
 )
-
