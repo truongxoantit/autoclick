@@ -46,6 +46,21 @@ class KeyManager:
         machine_id = hashlib.md5(machine_info.encode()).hexdigest()
         return machine_id
     
+    def _auto_register_machine(self):
+        """Tự động đăng ký máy lên GitHub"""
+        try:
+            if hasattr(self, 'auto_registration'):
+                if not self.auto_registration.is_registered():
+                    # Đăng ký máy mới
+                    if self.auto_registration.register_machine():
+                        print(f"Machine {self.machine_id} đã được đăng ký tự động lên GitHub")
+                    else:
+                        print(f"Không thể đăng ký máy lên GitHub (có thể do không có quyền ghi)")
+                else:
+                    print(f"Machine {self.machine_id} đã được đăng ký trước đó")
+        except Exception as e:
+            print(f"Lỗi khi đăng ký tự động: {e}")
+    
     def _load_local_key(self) -> Optional[Dict[str, Any]]:
         """Đọc key từ file local"""
         if os.path.exists(self.key_file):
