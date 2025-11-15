@@ -42,6 +42,8 @@ images/*.jpg
 images/*.jpeg
 images/*.bmp
 *.json
+!requirements.txt
+!keys.json
 *.txt
 !requirements.txt
 !README.md
@@ -56,3 +58,5 @@ images/*.bmp
 # Keep images folder but ignore contents
 images/.gitkeep
 
+# License key file (local)
+license.key

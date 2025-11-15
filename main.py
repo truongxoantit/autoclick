@@ -13,9 +13,12 @@ from image_finder import ImageFinder
 from script_executor import ScriptExecutor
 from image_picker import ImagePicker
 from region_selector import RegionSelector
+from key_manager import KeyManager
+from key_activation_dialog import KeyActivationDialog
 from pynput import keyboard
 from pynput.mouse import Controller as MouseController
 import time
+import sys
 
 
 class AutoClickApp:
@@ -32,6 +35,14 @@ class AutoClickApp:
         self.script_executor = ScriptExecutor(image_finder=self.image_finder)
         self.image_picker = ImagePicker(save_directory="images")
         self.mouse_controller = MouseController()
+        
+        # Khởi tạo Key Manager
+        self.key_manager = KeyManager(github_repo="truongxoantit/autoclick")
+        
+        # Kiểm tra key trước khi khởi động
+        if not self.check_license():
+            root.destroy()
+            sys.exit(0)
         
         # Biến trạng thái
         self.recording_file = None
@@ -91,6 +102,9 @@ class AutoClickApp:
         tools_menu.add_command(label="Export Actions", command=self.export_actions)
         tools_menu.add_command(label="Import Actions", command=self.import_actions)
         tools_menu.add_separator()
+        tools_menu.add_command(label="License Key", command=self.show_license_info)
+        tools_menu.add_command(label="Activate Key", command=self.activate_license)
+        tools_menu.add_separator()
         tools_menu.add_command(label="Settings", command=self.show_settings)
         
         # Bind keyboard shortcuts
@@ -137,6 +151,14 @@ class AutoClickApp:
         # Status label
         self.status_label = ttk.Label(toolbar, text="Ready", foreground="green")
         self.status_label.pack(side=tk.RIGHT, padx=10)
+        
+        # License status label
+        self.license_label = ttk.Label(toolbar, text="", foreground="blue", font=("Arial", 8))
+        self.license_label.pack(side=tk.RIGHT, padx=5)
+        self.update_license_status()
+        
+        # Kiểm tra license định kỳ (mỗi 5 phút)
+        self.check_license_periodically()
         
     def create_widgets(self):
         """Tạo các widget chính"""

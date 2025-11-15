@@ -1,0 +1,26 @@
+{
+  "keys": [
+    {
+      "key": "DEMO-KEY-2024-001",
+      "key_name": "Demo Key 1",
+      "expire_date": "2025-12-31T23:59:59",
+      "machine_id": null,
+      "created_date": "2024-01-01T00:00:00"
+    },
+    {
+      "key": "DEMO-KEY-2024-002",
+      "key_name": "Demo Key 2",
+      "expire_date": "2025-06-30T23:59:59",
+      "machine_id": null,
+      "created_date": "2024-01-01T00:00:00"
+    },
+    {
+      "key": "TEST-KEY-2024-001",
+      "key_name": "Test Key",
+      "expire_date": "2025-01-31T23:59:59",
+      "machine_id": null,
+      "created_date": "2024-01-01T00:00:00"
+    }
+  ]
+}
+

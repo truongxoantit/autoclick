@@ -25,7 +25,7 @@ set /p GITHUB_USER="Nhập GitHub username của bạn: "
 echo.
 echo Đang thêm remote origin...
 git remote remove origin 2>nul
-git remote add origin https://github.com/%GITHUB_USER%/autoclick.git
+git remote add origin https://github.com/truongxoantit/autoclick.git
 
 echo.
 echo Đang push lên GitHub...
@@ -40,7 +40,7 @@ if %errorlevel% equ 0 (
     echo ========================================
     echo.
     echo Repository của bạn tại:
-    echo https://github.com/%GITHUB_USER%/autoclick
+    echo https://github.com/truongxoantit/autoclick
     echo.
 ) else (
     echo.
