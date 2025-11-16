@@ -957,6 +957,188 @@ scroll x y dx dy"""
         else:
             messagebox.showinfo("Info", "Nothing to redo")
     
+    def bulk_edit_delay(self):
+        """Chỉnh delay hàng loạt cho tất cả actions hoặc actions được chọn"""
+        if not self.actions_list:
+            messagebox.showwarning("Warning", "No actions to edit!")
+            return
+        
+        # Lấy các items được chọn
+        selected_items = self.tree.selection()
+        selected_indices = []
+        
+        if selected_items:
+            # Chỉ chỉnh delay cho các items được chọn
+            for item in selected_items:
+                try:
+                    index = int(self.tree.item(item, 'values')[0]) - 1
+                    if 0 <= index < len(self.actions_list):
+                        selected_indices.append(index)
+                except:
+                    pass
+        else:
+            # Chỉnh delay cho tất cả actions
+            selected_indices = list(range(len(self.actions_list)))
+        
+        if not selected_indices:
+            messagebox.showwarning("Warning", "No actions selected!")
+            return
+        
+        # Tạo dialog để nhập delay
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Bulk Edit Delay")
+        dialog.geometry("400x300")
+        dialog.transient(self.root)
+        dialog.grab_set()
+        
+        # Center dialog
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - (dialog.winfo_width() // 2)
+        y = (dialog.winfo_screenheight() // 2) - (dialog.winfo_height() // 2)
+        dialog.geometry(f"+{x}+{y}")
+        
+        result = {'apply': False, 'mode': 'set', 'value': 0.1, 'multiplier': 1.0}
+        
+        # Info
+        info_label = ttk.Label(
+            dialog,
+            text=f"Editing delay for {len(selected_indices)} action(s)",
+            font=("Arial", 10, "bold")
+        )
+        info_label.pack(pady=10)
+        
+        # Mode selection
+        mode_frame = ttk.LabelFrame(dialog, text="Mode", padding="10")
+        mode_frame.pack(fill=tk.X, padx=20, pady=10)
+        
+        mode_var = tk.StringVar(value="set")
+        
+        def update_mode():
+            result['mode'] = mode_var.get()
+            if mode_var.get() == "set":
+                value_entry.config(state=tk.NORMAL)
+                multiplier_entry.config(state=tk.DISABLED)
+            else:
+                value_entry.config(state=tk.NORMAL if mode_var.get() == "add" else tk.DISABLED)
+                multiplier_entry.config(state=tk.NORMAL if mode_var.get() == "multiply" else tk.DISABLED)
+        
+        ttk.Radiobutton(
+            mode_frame,
+            text="Set fixed delay (seconds)",
+            variable=mode_var,
+            value="set",
+            command=update_mode
+        ).pack(anchor=tk.W)
+        
+        ttk.Radiobutton(
+            mode_frame,
+            text="Multiply current delay by",
+            variable=mode_var,
+            value="multiply",
+            command=update_mode
+        ).pack(anchor=tk.W, pady=(5, 0))
+        
+        ttk.Radiobutton(
+            mode_frame,
+            text="Add to current delay (seconds)",
+            variable=mode_var,
+            value="add",
+            command=update_mode
+        ).pack(anchor=tk.W, pady=(5, 0))
+        
+        # Value input
+        value_frame = ttk.Frame(dialog, padding="10")
+        value_frame.pack(fill=tk.X, padx=20)
+        
+        ttk.Label(value_frame, text="Delay value:").pack(side=tk.LEFT, padx=5)
+        value_entry = ttk.Entry(value_frame, width=15)
+        value_entry.insert(0, "0.1")
+        value_entry.pack(side=tk.LEFT, padx=5)
+        ttk.Label(value_frame, text="seconds").pack(side=tk.LEFT, padx=5)
+        
+        ttk.Label(value_frame, text="Multiplier:").pack(side=tk.LEFT, padx=5)
+        multiplier_entry = ttk.Entry(value_frame, width=15)
+        multiplier_entry.insert(0, "1.0")
+        multiplier_entry.config(state=tk.DISABLED)
+        multiplier_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Preview
+        preview_label = ttk.Label(
+            dialog,
+            text="",
+            font=("Arial", 9),
+            foreground="blue"
+        )
+        preview_label.pack(pady=5)
+        
+        def update_preview():
+            try:
+                if mode_var.get() == "set":
+                    val = float(value_entry.get())
+                    preview_label.config(text=f"All delays will be set to {val} seconds")
+                elif mode_var.get() == "multiply":
+                    mult = float(multiplier_entry.get())
+                    preview_label.config(text=f"All delays will be multiplied by {mult}")
+                else:  # add
+                    val = float(value_entry.get())
+                    preview_label.config(text=f"{val} seconds will be added to all delays")
+            except:
+                preview_label.config(text="Invalid input")
+        
+        value_entry.bind('<KeyRelease>', lambda e: update_preview())
+        multiplier_entry.bind('<KeyRelease>', lambda e: update_preview())
+        update_preview()
+        
+        # Buttons
+        btn_frame = ttk.Frame(dialog, padding="20")
+        btn_frame.pack(fill=tk.X)
+        
+        def apply():
+            try:
+                result['mode'] = mode_var.get()
+                if mode_var.get() == "set":
+                    result['value'] = float(value_entry.get())
+                elif mode_var.get() == "multiply":
+                    result['multiplier'] = float(multiplier_entry.get())
+                else:  # add
+                    result['value'] = float(value_entry.get())
+                
+                result['apply'] = True
+                dialog.destroy()
+            except ValueError:
+                messagebox.showerror("Error", "Invalid input! Please enter a valid number.")
+        
+        ttk.Button(btn_frame, text="Apply", command=apply, width=15).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="Cancel", command=dialog.destroy, width=15).pack(side=tk.LEFT, padx=5)
+        
+        dialog.wait_window()
+        
+        if result['apply']:
+            # Lưu vào history
+            self._save_to_history()
+            
+            # Áp dụng delay
+            modified_count = 0
+            for idx in selected_indices:
+                action = self.actions_list[idx]
+                current_delay = action.get('delay', 0.1)
+                
+                if result['mode'] == "set":
+                    new_delay = result['value']
+                elif result['mode'] == "multiply":
+                    new_delay = current_delay * result['multiplier']
+                else:  # add
+                    new_delay = current_delay + result['value']
+                
+                # Đảm bảo delay không âm
+                new_delay = max(0.0, new_delay)
+                action['delay'] = new_delay
+                modified_count += 1
+            
+            self.update_actions_display()
+            self.log(f"Bulk edited delay for {modified_count} action(s)")
+            messagebox.showinfo("Success", f"Updated delay for {modified_count} action(s)!")
+    
     def add_random_delay(self):
         """Thêm delay ngẫu nhiên vào các hành động"""
         import random
