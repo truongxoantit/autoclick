@@ -530,9 +530,15 @@ scroll x y dx dy"""
         if dialog:
             self._save_to_history()
             key, delay = dialog
+            
+            # Tính timestamp
+            last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+            new_time = last_time + (float(delay) / 1000)
+            
             action = {
                 'type': 'key',
                 'key': key,
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
                 'delay': float(delay) / 1000,
                 'description': f'Keystroke "{key}"'
             }
@@ -651,10 +657,15 @@ scroll x y dx dy"""
             success = self.image_finder.find_and_click(filename, delay=0.2)
             if success:
                 position = self.image_finder.find_image(filename)
+                # Tính timestamp
+                last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+                new_time = last_time + 0.1
+                
                 action = {
                     'type': 'click',
                     'x': position[0],
                     'y': position[1],
+                    'time': new_time,  # Timestamp để phát lại đúng tốc độ
                     'delay': 0.1,
                     'description': f'Smart Click at image ({position[0]}, {position[1]})'
                 }
@@ -883,10 +894,15 @@ scroll x y dx dy"""
             self.root.clipboard_clear()
             self.root.clipboard_append(f"{x}, {y}")
             
+            # Tính timestamp
+            last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+            new_time = last_time + 0.1
+            
             action = {
                 'type': 'click',
                 'x': x,
                 'y': y,
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
                 'delay': 0.1,
                 'description': f'Mouse Click at ({x}, {y})'
             }
