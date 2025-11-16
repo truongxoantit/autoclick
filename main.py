@@ -467,10 +467,15 @@ scroll x y dx dy"""
         if dialog:
             self._save_to_history()
             x, y, delay = dialog
+            # Tính timestamp dựa trên actions hiện có
+            last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+            new_time = last_time + (float(delay) / 1000)
+            
             action = {
                 'type': 'click',
                 'x': int(x),
                 'y': int(y),
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
                 'delay': float(delay) / 1000,
                 'description': f'Mouse Left Click at ({x}, {y})'
             }
@@ -483,10 +488,15 @@ scroll x y dx dy"""
         if dialog:
             self._save_to_history()
             x, y, delay = dialog
+            # Tính timestamp dựa trên actions hiện có
+            last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+            new_time = last_time + (float(delay) / 1000)
+            
             action = {
                 'type': 'move',
                 'x': int(x),
                 'y': int(y),
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
                 'delay': float(delay) / 1000,
                 'description': f'Move mouse to ({x}, {y})'
             }
@@ -499,9 +509,15 @@ scroll x y dx dy"""
         if dialog:
             self._save_to_history()
             seconds = float(dialog[0])
+            
+            # Tính timestamp
+            last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+            new_time = last_time + seconds
+            
             action = {
                 'type': 'wait',
                 'seconds': seconds,
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
                 'delay': seconds,
                 'description': f'Delay {seconds} seconds'
             }
@@ -660,7 +676,10 @@ scroll x y dx dy"""
                 return
             
             # Chuyển đổi actions_list sang format cho player
+            # Đảm bảo actions được sắp xếp theo timestamp
             actions = [self._dict_to_action(a) for a in self.actions_list]
+            # Sắp xếp theo timestamp để đảm bảo thứ tự đúng
+            actions.sort(key=lambda a: a.get('time', 0))
             
             # Tính toán repeat
             repeat_count = 1
@@ -839,9 +858,14 @@ scroll x y dx dy"""
                 
                 # Hỏi có muốn thêm vào actions không
                 if messagebox.askyesno("Add Action", "Add 'Find Image' action to list?"):
+                    # Tính timestamp
+                    last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+                    new_time = last_time + 0.5
+                    
                     action = {
                         'type': 'findimage',
                         'image_path': filepath,
+                        'time': new_time,  # Timestamp để phát lại đúng tốc độ
                         'delay': 0.5,
                         'description': f'Find Image: {os.path.basename(filepath)}'
                     }
@@ -1204,18 +1228,21 @@ scroll x y dx dy"""
                 self.log(f"Import error: {e}")
     
     def _convert_action_to_dict(self, action):
-        """Chuyển đổi action từ recorder format sang dict"""
+        """Chuyển đổi action từ recorder format sang dict - GIỮ LẠI TIMESTAMP"""
         action_type = action.get('type', '')
         x = action.get('x', 0)
         y = action.get('y', 0)
-        time_val = action.get('time', 0)
+        time_val = action.get('time', 0)  # Timestamp gốc từ recorder
         
+        # Tính delay dựa trên timestamp (sẽ được tính khi phát lại)
+        # Nhưng cũng lưu delay mặc định để hiển thị
         if action_type == 'click' or 'press_left' in action_type:
             return {
                 'type': 'click',
                 'x': x,
                 'y': y,
-                'delay': 0.1,
+                'time': time_val,  # GIỮ LẠI timestamp gốc
+                'delay': 0.1,  # Delay mặc định để hiển thị
                 'description': f'Mouse Left Click at ({x}, {y})'
             }
         elif action_type == 'move':
@@ -1223,13 +1250,35 @@ scroll x y dx dy"""
                 'type': 'move',
                 'x': x,
                 'y': y,
-                'delay': 0.1,
+                'time': time_val,  # GIỮ LẠI timestamp gốc
+                'delay': 0.1,  # Delay mặc định để hiển thị
                 'description': f'Move mouse to ({x}, {y})'
+            }
+        elif action_type == 'press_right' or 'right' in action_type:
+            return {
+                'type': 'rightclick',
+                'x': x,
+                'y': y,
+                'time': time_val,  # GIỮ LẠI timestamp gốc
+                'delay': 0.1,
+                'description': f'Mouse Right Click at ({x}, {y})'
+            }
+        elif action_type == 'scroll':
+            return {
+                'type': 'scroll',
+                'x': x,
+                'y': y,
+                'dx': action.get('dx', 0),
+                'dy': action.get('dy', 0),
+                'time': time_val,  # GIỮ LẠI timestamp gốc
+                'delay': 0.1,
+                'description': f'Scroll at ({x}, {y})'
             }
         elif action_type == 'wait':
             return {
                 'type': 'wait',
                 'seconds': time_val,
+                'time': time_val,  # GIỮ LẠI timestamp gốc
                 'delay': time_val,
                 'description': f'Delay {time_val} seconds'
             }
@@ -1243,50 +1292,83 @@ scroll x y dx dy"""
             }
     
     def _convert_script_action_to_dict(self, action):
-        """Chuyển đổi script action sang dict"""
+        """Chuyển đổi script action sang dict - tính timestamp"""
         action_type = action.get('type', '')
+        
+        # Tính timestamp dựa trên actions hiện có
+        last_time = self.actions_list[-1].get('time', 0) if self.actions_list else 0
+        delay = action.get('delay', 0.1)
+        new_time = last_time + delay
+        
         if action_type == 'click':
             return {
                 'type': 'click',
                 'x': action.get('x', 0),
                 'y': action.get('y', 0),
-                'delay': action.get('delay', 0.1),
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
+                'delay': delay,
                 'description': f'Mouse Left Click at ({action.get("x", 0)}, {action.get("y", 0)})'
             }
         elif action_type == 'wait':
+            seconds = action.get('seconds', 1.0)
             return {
                 'type': 'wait',
-                'seconds': action.get('seconds', 1.0),
-                'delay': action.get('seconds', 1.0),
-                'description': f'Delay {action.get("seconds", 1.0)} seconds'
+                'seconds': seconds,
+                'time': new_time,  # Timestamp để phát lại đúng tốc độ
+                'delay': seconds,
+                'description': f'Delay {seconds} seconds'
             }
         else:
+            # Thêm time nếu chưa có
+            if 'time' not in action:
+                action['time'] = new_time
             return action
     
     def _dict_to_action(self, action_dict):
-        """Chuyển đổi dict sang action format cho player"""
+        """Chuyển đổi dict sang action format cho player - GIỮ LẠI TIMESTAMP"""
         action_type = action_dict.get('type', '')
+        time_val = action_dict.get('time', 0)  # Lấy timestamp gốc
+        
         if action_type == 'click':
             return {
                 'type': 'press_left',
                 'x': action_dict.get('x', 0),
                 'y': action_dict.get('y', 0),
-                'time': 0
+                'time': time_val  # GIỮ LẠI timestamp để tính delay chính xác
             }
         elif action_type == 'move':
             return {
                 'type': 'move',
                 'x': action_dict.get('x', 0),
                 'y': action_dict.get('y', 0),
-                'time': 0
+                'time': time_val  # GIỮ LẠI timestamp để tính delay chính xác
+            }
+        elif action_type == 'rightclick':
+            return {
+                'type': 'press_right',
+                'x': action_dict.get('x', 0),
+                'y': action_dict.get('y', 0),
+                'time': time_val
+            }
+        elif action_type == 'scroll':
+            return {
+                'type': 'scroll',
+                'x': action_dict.get('x', 0),
+                'y': action_dict.get('y', 0),
+                'dx': action_dict.get('dx', 0),
+                'dy': action_dict.get('dy', 0),
+                'time': time_val
             }
         elif action_type == 'wait':
             return {
                 'type': 'wait',
                 'seconds': action_dict.get('seconds', 1.0),
-                'time': action_dict.get('delay', 1.0)
+                'time': time_val  # Sử dụng timestamp gốc
             }
         else:
+            # Giữ nguyên nếu đã có time
+            if 'time' not in action_dict:
+                action_dict['time'] = 0
             return action_dict
     
     def check_license(self) -> bool:
