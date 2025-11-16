@@ -92,6 +92,7 @@ class AutoClickApp:
         edit_menu.add_command(label="Clear All", command=self.clear_all)
         edit_menu.add_separator()
         edit_menu.add_command(label="Add Random Delay", command=self.add_random_delay)
+        edit_menu.add_command(label="Bulk Edit Delay", command=self.bulk_edit_delay)
         
         # Insert menu
         insert_menu = tk.Menu(menubar, tearoff=0)
@@ -227,6 +228,7 @@ class AutoClickApp:
         ttk.Button(actions_toolbar, text="Get Pos", command=self.get_mouse_position, width=10).pack(side=tk.LEFT, padx=1)
         ttk.Button(actions_toolbar, text="Screenshot", command=self.capture_screen, width=10).pack(side=tk.LEFT, padx=1)
         ttk.Button(actions_toolbar, text="Edit Delay", command=self.edit_selected_delay, width=10).pack(side=tk.LEFT, padx=1)
+        ttk.Button(actions_toolbar, text="Bulk Delay", command=self.bulk_edit_delay, width=10).pack(side=tk.LEFT, padx=1)
         ttk.Button(actions_toolbar, text="Undo", command=self.undo_action, width=8).pack(side=tk.LEFT, padx=1)
         ttk.Button(actions_toolbar, text="Redo", command=self.redo_action, width=8).pack(side=tk.LEFT, padx=1)
         
